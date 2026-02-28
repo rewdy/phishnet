@@ -56,6 +56,7 @@ bun run ui:lint
 bun run ui:build
 
 bun run launchd:install
+bun run launchd:restart
 bun run launchd:status
 bun run launchd:uninstall
 ```
@@ -66,7 +67,7 @@ bun run launchd:uninstall
 - `api/` local read API for run/decision data
 - `ui/` Mantine + React viewer
 - `shared/` shared Zod schemas/types used by API and UI
-- `scripts/launchd/` launchd install/status/uninstall scripts
+- `scripts/launchd/` launchd install/restart/status/uninstall scripts
 - `docs/` planning docs
 
 ### Data and logs

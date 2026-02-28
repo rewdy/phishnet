@@ -30,6 +30,7 @@
     "ui:preview": "cd ui && bun run preview -- --host 127.0.0.1 --port 54321 --strictPort",
     "ui:lint": "cd ui && bun run lint",
     "launchd:install": "./scripts/launchd/install.sh",
+    "launchd:restart": "./scripts/launchd/restart.sh",
     "launchd:status": "./scripts/launchd/status.sh",
     "launchd:uninstall": "./scripts/launchd/uninstall.sh"
   },

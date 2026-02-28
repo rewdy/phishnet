@@ -114,6 +114,12 @@ Check status:
 bun run launchd:status
 ```
 
+Restart the stack service (for example, after changing `service/.env`):
+
+```bash
+bun run launchd:restart
+```
+
 Logs:
 
 - `~/Library/Logs/phishnet.stack.out.log`

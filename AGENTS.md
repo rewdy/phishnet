@@ -24,7 +24,7 @@ This repo is a Bun monorepo with 4 workspaces:
 - `README.md`: project overview + day-to-day dev commands
 - `INSTALL.md`: setup instructions (credentials, launchd, install/uninstall)
 - `docs/`: planning docs only (do not place installation docs here)
-- `scripts/launchd/`: launchd install/status/uninstall scripts
+- `scripts/launchd/`: launchd install/restart/status/uninstall scripts
 - `phishnet.png`, `phishnet-lg.png`: project branding assets
 
 ## Current Runtime Topology
@@ -55,6 +55,7 @@ Run `bun run check` before committing.
 - `bun run web` -> API + UI preview
 - `bun run start` -> service + API + UI preview
 - `bun run launchd:install`
+- `bun run launchd:restart`
 - `bun run launchd:status`
 - `bun run launchd:uninstall`
 
@@ -130,6 +131,7 @@ UI expectations:
 
 Use scripts instead of committing machine-specific plist files:
 - `scripts/launchd/install.sh`
+- `scripts/launchd/restart.sh`
 - `scripts/launchd/status.sh`
 - `scripts/launchd/uninstall.sh`
 
