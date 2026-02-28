@@ -17,7 +17,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { fetchDecisions, fetchRuns } from "./api";
-import { pageSizeValues, type DecisionsQuery, type FinalAction, type RunsQuery } from "@dream-weaver/shared";
+import { pageSizeValues, type DecisionsQuery, type FinalAction, type RunsQuery } from "@phishnet/shared";
 
 const PAGE_SIZE_OPTIONS = pageSizeValues.map((value) => ({ value: String(value), label: String(value) }));
 const TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "America/Chicago";

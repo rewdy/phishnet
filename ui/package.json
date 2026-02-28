@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@dream-weaver/shared": "workspace:*",
+    "@phishnet/shared": "workspace:*",
     "@mantine/charts": "^8.3.15",
     "@mantine/core": "^8.3.15",
     "@mantine/hooks": "^8.3.15",

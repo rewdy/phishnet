@@ -5,7 +5,7 @@ import {
   type DecisionsResponse,
   type RunsQuery,
   type RunsResponse,
-} from "@dream-weaver/shared";
+} from "@phishnet/shared";
 
 function buildQueryString(params: Record<string, string | number | undefined>): string {
   const query = new URLSearchParams();

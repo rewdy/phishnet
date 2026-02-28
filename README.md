@@ -1,4 +1,4 @@
-# dream-weaver monorepo
+# phishnet monorepo
 
 ## Workspace layout
 

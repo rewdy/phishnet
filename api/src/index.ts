@@ -10,7 +10,7 @@ import {
   type DecisionsQuery,
   type RunSummary,
   type RunsQuery,
-} from "@dream-weaver/shared";
+} from "@phishnet/shared";
 
 const app = new Hono();
 const port = Number(process.env.PORT ?? 8787);

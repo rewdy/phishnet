@@ -1,4 +1,4 @@
-# dream-weaver
+# phishnet
 
 Local TypeScript/Bun service that polls iCloud IMAP, classifies unread mail with OpenAI, and moves sexual-content messages to Junk.
 
