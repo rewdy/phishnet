@@ -71,6 +71,12 @@ Install interactively:
 bun run launchd:install
 ```
 
+If bun is installed in a non-standard location, pass it explicitly:
+
+```bash
+PHISHNET_BUN_BIN=/absolute/path/to/bun bun run launchd:install
+```
+
 Install non-interactively:
 
 ```bash

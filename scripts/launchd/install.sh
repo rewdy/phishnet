@@ -10,15 +10,42 @@ STACK_PLIST="${LAUNCH_AGENTS_DIR}/${STACK_LABEL}.plist"
 CLEANUP_PLIST="${LAUNCH_AGENTS_DIR}/${CLEANUP_LABEL}.plist"
 UID_VALUE="$(id -u)"
 
-BUN_BIN="$(command -v bun || true)"
-if [[ -z "${BUN_BIN}" ]]; then
-  if [[ -x "${HOME}/.bun/bin/bun" ]]; then
-    BUN_BIN="${HOME}/.bun/bin/bun"
-  else
-    echo "bun was not found in PATH or ~/.bun/bin/bun"
-    exit 1
+resolve_bun_bin() {
+  if [[ -n "${PHISHNET_BUN_BIN:-}" ]]; then
+    if [[ -x "${PHISHNET_BUN_BIN}" ]]; then
+      echo "${PHISHNET_BUN_BIN}"
+      return 0
+    fi
+    echo "PHISHNET_BUN_BIN is set but not executable: ${PHISHNET_BUN_BIN}" >&2
+    return 1
   fi
-fi
+
+  local candidates=(
+    "${HOME}/.bun/bin/bun"
+    "/opt/homebrew/bin/bun"
+    "/usr/local/bin/bun"
+  )
+
+  for candidate in "${candidates[@]}"; do
+    if [[ -x "${candidate}" ]]; then
+      echo "${candidate}"
+      return 0
+    fi
+  done
+
+  local discovered
+  discovered="$(command -v bun || true)"
+  if [[ -n "${discovered}" && -x "${discovered}" ]]; then
+    echo "${discovered}"
+    return 0
+  fi
+
+  echo "bun binary not found. Install bun or set PHISHNET_BUN_BIN=/absolute/path/to/bun" >&2
+  return 1
+}
+
+BUN_BIN="$(resolve_bun_bin)"
+BUN_DIR="$(dirname "${BUN_BIN}")"
 
 ASSUME_YES=false
 if [[ "${1:-}" == "--yes" ]]; then
@@ -40,8 +67,8 @@ mkdir -p "${LAUNCH_AGENTS_DIR}" "${LOG_DIR}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "${TMP_DIR}"' EXIT
 
-STACK_COMMAND="export PATH=\"${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin\"; cd \"${ROOT_DIR}\" &amp;&amp; \"${BUN_BIN}\" run start"
-CLEANUP_COMMAND="export PATH=\"${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin\"; cd \"${ROOT_DIR}\" &amp;&amp; \"${BUN_BIN}\" run service:cleanup"
+STACK_COMMAND="export PATH=\"${BUN_DIR}:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin\"; cd \"${ROOT_DIR}\" &amp;&amp; \"${BUN_BIN}\" run start"
+CLEANUP_COMMAND="export PATH=\"${BUN_DIR}:${HOME}/.bun/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin\"; cd \"${ROOT_DIR}\" &amp;&amp; \"${BUN_BIN}\" run service:cleanup"
 
 cat > "${TMP_DIR}/${STACK_LABEL}.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -132,6 +159,8 @@ plutil -lint "${TMP_DIR}/${CLEANUP_LABEL}.plist" >/dev/null
 echo "Generated launchd plists in ${TMP_DIR}:"
 echo "- ${TMP_DIR}/${STACK_LABEL}.plist"
 echo "- ${TMP_DIR}/${CLEANUP_LABEL}.plist"
+echo "Using bun binary: ${BUN_BIN}"
+echo "Using bun directory in PATH: ${BUN_DIR}"
 
 echo
 if ! prompt_yes_no "Install these plist files to ${LAUNCH_AGENTS_DIR} and start services?"; then
