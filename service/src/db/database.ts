@@ -1,6 +1,6 @@
+import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { Database } from "bun:sqlite";
 
 export function createDatabase(sqlitePath: string): Database {
   mkdirSync(dirname(sqlitePath), { recursive: true });
@@ -65,7 +65,9 @@ export function runMigrations(db: Database): void {
   const decisionColumns = db
     .query("PRAGMA table_info(decisions)")
     .all() as Array<{ name: string }>;
-  const hasSubjectText = decisionColumns.some((column) => column.name === "subject_text");
+  const hasSubjectText = decisionColumns.some(
+    (column) => column.name === "subject_text",
+  );
   if (!hasSubjectText) {
     db.exec("ALTER TABLE decisions ADD COLUMN subject_text TEXT;");
   }

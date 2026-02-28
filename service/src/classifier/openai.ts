@@ -47,7 +47,9 @@ export class OpenAIClassifier implements MessageClassifier {
 
     const parsed = completion.choices[0]?.message?.parsed;
     if (!parsed) {
-      throw new Error("OpenAI response did not include parsed classification output");
+      throw new Error(
+        "OpenAI response did not include parsed classification output",
+      );
     }
 
     return parsed;

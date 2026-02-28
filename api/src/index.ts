@@ -1,28 +1,44 @@
 import { Database } from "bun:sqlite";
-import { Hono } from "hono";
-import { cors } from "hono/cors";
 import {
-  DecisionsQuerySchema,
-  DecisionsResponseSchema,
-  RunsQuerySchema,
-  RunsResponseSchema,
   type DecisionRow,
   type DecisionsQuery,
+  DecisionsQuerySchema,
+  DecisionsResponseSchema,
   type RunSummary,
   type RunsQuery,
+  RunsQuerySchema,
+  RunsResponseSchema,
 } from "@phishnet/shared";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
 
 const app = new Hono();
 const port = Number(process.env.PORT ?? 8787);
-const sqlitePath = process.env.SERVICE_DB_PATH ?? "../service/data/email-filter.db";
+const sqlitePath =
+  process.env.SERVICE_DB_PATH ?? "../service/data/email-filter.db";
 const db = new Database(sqlitePath, { create: false, strict: true });
-const decisionColumns = db.query("PRAGMA table_info(decisions)").all() as Array<{ name: string }>;
-const hasSubjectText = decisionColumns.some((column) => column.name === "subject_text");
-const subjectTextSelect = hasSubjectText ? "subject_text" : "NULL AS subject_text";
+const decisionColumns = db
+  .query("PRAGMA table_info(decisions)")
+  .all() as Array<{ name: string }>;
+const hasSubjectText = decisionColumns.some(
+  (column) => column.name === "subject_text",
+);
+const subjectTextSelect = hasSubjectText
+  ? "subject_text"
+  : "NULL AS subject_text";
 
 app.use("*", cors());
 
-function parseQuery<T>(schema: { safeParse: (value: unknown) => { success: boolean; data?: T; error?: unknown } }, raw: Record<string, string>) {
+function parseQuery<T>(
+  schema: {
+    safeParse: (value: unknown) => {
+      success: boolean;
+      data?: T;
+      error?: unknown;
+    };
+  },
+  raw: Record<string, string>,
+) {
   const parsed = schema.safeParse(raw);
   if (!parsed.success) {
     return null;
@@ -31,7 +47,9 @@ function parseQuery<T>(schema: { safeParse: (value: unknown) => { success: boole
   return parsed.data as T;
 }
 
-app.get("/health", (c) => c.json({ ok: true, service: "api", dbPath: sqlitePath }));
+app.get("/health", (c) =>
+  c.json({ ok: true, service: "api", dbPath: sqlitePath }),
+);
 app.get("/", (c) => c.json({ ok: true, service: "api" }));
 
 app.get("/api/runs", (c) => {
@@ -77,7 +95,9 @@ app.get("/api/runs", (c) => {
     messagesFailed: row.messages_failed,
   }));
 
-  const totalRow = db.query("SELECT COUNT(*) as count FROM runs").get() as { count: number };
+  const totalRow = db.query("SELECT COUNT(*) as count FROM runs").get() as {
+    count: number;
+  };
 
   const response = RunsResponseSchema.parse({
     items,
@@ -89,7 +109,10 @@ app.get("/api/runs", (c) => {
   return c.json(response);
 });
 
-function buildDecisionWhereClause(query: DecisionsQuery): { clause: string; params: string[] } {
+function buildDecisionWhereClause(query: DecisionsQuery): {
+  clause: string;
+  params: string[];
+} {
   const conditions: string[] = [];
   const params: string[] = [];
 
@@ -122,7 +145,10 @@ function buildDecisionWhereClause(query: DecisionsQuery): { clause: string; para
 }
 
 app.get("/api/decisions", (c) => {
-  const parsed = parseQuery<DecisionsQuery>(DecisionsQuerySchema, c.req.query());
+  const parsed = parseQuery<DecisionsQuery>(
+    DecisionsQuerySchema,
+    c.req.query(),
+  );
   if (!parsed) {
     return c.json({ error: "Invalid query params" }, 400);
   }

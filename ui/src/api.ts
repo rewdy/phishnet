@@ -1,13 +1,15 @@
 import {
-  DecisionsResponseSchema,
-  RunsResponseSchema,
   type DecisionsQuery,
   type DecisionsResponse,
+  DecisionsResponseSchema,
   type RunsQuery,
   type RunsResponse,
+  RunsResponseSchema,
 } from "@phishnet/shared";
 
-function buildQueryString(params: Record<string, string | number | undefined>): string {
+function buildQueryString(
+  params: Record<string, string | number | undefined>,
+): string {
   const query = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {
     if (value === undefined || value === "") continue;
@@ -27,11 +29,20 @@ export async function fetchRuns(params: RunsQuery): Promise<RunsResponse> {
   return RunsResponseSchema.parse(json);
 }
 
-export async function fetchDecisions(params: DecisionsQuery): Promise<DecisionsResponse> {
-  const response = await fetch(`/api/decisions${buildQueryString({
-    ...params,
-    hasError: params.hasError === undefined ? undefined : params.hasError ? "true" : "false",
-  })}`);
+export async function fetchDecisions(
+  params: DecisionsQuery,
+): Promise<DecisionsResponse> {
+  const response = await fetch(
+    `/api/decisions${buildQueryString({
+      ...params,
+      hasError:
+        params.hasError === undefined
+          ? undefined
+          : params.hasError
+            ? "true"
+            : "false",
+    })}`,
+  );
   if (!response.ok) {
     throw new Error(`Failed to fetch decisions (${response.status})`);
   }

@@ -1,11 +1,15 @@
+import type { MessageClassifier } from "../classifier/openai";
 import type { AppConfig } from "../config";
-import type { DecisionsRepository, RunsRepository, StateRepository } from "../db/repositories";
+import type {
+  DecisionsRepository,
+  RunsRepository,
+  StateRepository,
+} from "../db/repositories";
+import { serializeError } from "../errors";
 import type { AllowlistMatcher } from "../filter/allowlist";
 import type { ImapClient } from "../imap/client";
-import { serializeError } from "../errors";
 import { logger } from "../logger";
 import { processMessage } from "../pipeline/process-message";
-import type { MessageClassifier } from "../classifier/openai";
 
 export interface RunOnceDeps {
   config: AppConfig;
@@ -17,7 +21,10 @@ export interface RunOnceDeps {
   classifier: MessageClassifier;
 }
 
-export async function runOnce(deps: RunOnceDeps, options?: { forceDryRun?: boolean }): Promise<void> {
+export async function runOnce(
+  deps: RunOnceDeps,
+  options?: { forceDryRun?: boolean },
+): Promise<void> {
   const runId = deps.runsRepo.startRun();
   let messagesScanned = 0;
   let messagesClassified = 0;
@@ -25,7 +32,9 @@ export async function runOnce(deps: RunOnceDeps, options?: { forceDryRun?: boole
   let messagesFailed = 0;
 
   try {
-    const messages = await deps.imapClient.listUnread(deps.config.maxMessagesPerRun);
+    const messages = await deps.imapClient.listUnread(
+      deps.config.maxMessagesPerRun,
+    );
     messagesScanned = messages.length;
 
     for (const message of messages) {

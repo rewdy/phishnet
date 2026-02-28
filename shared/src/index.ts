@@ -2,18 +2,30 @@ import { z } from "zod";
 
 export const pageSizeValues = [25, 50, 75, 100] as const;
 
-export const FinalActionSchema = z.enum(["junk", "keep", "error", "allowlist_skip"]);
+export const FinalActionSchema = z.enum([
+  "junk",
+  "keep",
+  "error",
+  "allowlist_skip",
+]);
 export const ModelActionSchema = z.enum(["junk", "keep"]);
-export const RunStatusSchema = z.enum(["success", "partial_failure", "failure"]);
+export const RunStatusSchema = z.enum([
+  "success",
+  "partial_failure",
+  "failure",
+]);
 
 export const PaginationQuerySchema = z.object({
-  limit: z
-    .coerce
+  limit: z.coerce
     .number()
     .int()
-    .refine((value) => pageSizeValues.includes(value as (typeof pageSizeValues)[number]), {
-      message: "limit must be one of 25, 50, 75, 100",
-    })
+    .refine(
+      (value) =>
+        pageSizeValues.includes(value as (typeof pageSizeValues)[number]),
+      {
+        message: "limit must be one of 25, 50, 75, 100",
+      },
+    )
     .default(25),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -23,16 +35,15 @@ export const RunsQuerySchema = PaginationQuerySchema;
 export const DecisionsQuerySchema = PaginationQuerySchema.extend({
   finalAction: FinalActionSchema.optional(),
   from: z.string().trim().min(1).optional(),
-  hasError: z
-    .preprocess((value) => {
-      if (value === undefined) return undefined;
-      if (typeof value === "string") {
-        const normalized = value.trim().toLowerCase();
-        if (["1", "true", "yes"].includes(normalized)) return true;
-        if (["0", "false", "no"].includes(normalized)) return false;
-      }
-      return value;
-    }, z.boolean().optional()),
+  hasError: z.preprocess((value) => {
+    if (value === undefined) return undefined;
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+      if (["1", "true", "yes"].includes(normalized)) return true;
+      if (["0", "false", "no"].includes(normalized)) return false;
+    }
+    return value;
+  }, z.boolean().optional()),
 });
 
 export const RunSummarySchema = z.object({

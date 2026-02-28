@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
   },
 });
 
+// biome-ignore lint/style/noNonNullAssertion: This is vite scaffolding...
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>

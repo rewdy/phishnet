@@ -14,12 +14,20 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
+import {
+  type DecisionsQuery,
+  type FinalAction,
+  pageSizeValues,
+  type RunsQuery,
+} from "@phishnet/shared";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { fetchDecisions, fetchRuns } from "./api";
-import { pageSizeValues, type DecisionsQuery, type FinalAction, type RunsQuery } from "@phishnet/shared";
 
-const PAGE_SIZE_OPTIONS = pageSizeValues.map((value) => ({ value: String(value), label: String(value) }));
+const PAGE_SIZE_OPTIONS = pageSizeValues.map((value) => ({
+  value: String(value),
+  label: String(value),
+}));
 const TIMEZONE = import.meta.env.VITE_TIMEZONE ?? "America/Chicago";
 
 function parseTimestamp(value: string): Date {
@@ -27,7 +35,7 @@ function parseTimestamp(value: string): Date {
     return new Date(value);
   }
 
-  return new Date(value.replace(" ", "T") + "Z");
+  return new Date(`${value.replace(" ", "T")}Z`);
 }
 
 function formatTimestamp(value: string | null): string {
@@ -66,10 +74,13 @@ function RunsTable() {
   const [limit, setLimit] = useState<number>(25);
   const [page, setPage] = useState<number>(1);
 
-  const query = useMemo<RunsQuery>(() => ({
-    limit,
-    offset: (page - 1) * limit,
-  }), [limit, page]);
+  const query = useMemo<RunsQuery>(
+    () => ({
+      limit,
+      offset: (page - 1) * limit,
+    }),
+    [limit, page],
+  );
 
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["runs", query],
@@ -94,7 +105,9 @@ function RunsTable() {
             }}
             w={140}
           />
-          <Text size="sm" c="dimmed">{data ? `Total runs: ${data.total}` : "Total runs: -"}</Text>
+          <Text size="sm" c="dimmed">
+            {data ? `Total runs: ${data.total}` : "Total runs: -"}
+          </Text>
         </Group>
         {isFetching && <Loader size="sm" />}
       </Group>
@@ -144,17 +157,22 @@ function RunsTable() {
 function DecisionsTable() {
   const [limit, setLimit] = useState<number>(25);
   const [page, setPage] = useState<number>(1);
-  const [finalAction, setFinalAction] = useState<FinalAction | undefined>(undefined);
+  const [finalAction, setFinalAction] = useState<FinalAction | undefined>(
+    undefined,
+  );
   const [fromFilter, setFromFilter] = useState<string>("");
   const [hasError, setHasError] = useState<boolean | undefined>(undefined);
 
-  const query = useMemo<DecisionsQuery>(() => ({
-    limit,
-    offset: (page - 1) * limit,
-    finalAction,
-    from: fromFilter.trim() ? fromFilter.trim() : undefined,
-    hasError,
-  }), [limit, page, finalAction, fromFilter, hasError]);
+  const query = useMemo<DecisionsQuery>(
+    () => ({
+      limit,
+      offset: (page - 1) * limit,
+      finalAction,
+      from: fromFilter.trim() ? fromFilter.trim() : undefined,
+      hasError,
+    }),
+    [limit, page, finalAction, fromFilter, hasError],
+  );
 
   const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["decisions", query],
@@ -225,7 +243,9 @@ function DecisionsTable() {
           />
         </Group>
         <Group>
-          <Text size="sm" c="dimmed">{data ? `Total decisions: ${data.total}` : "Total decisions: -"}</Text>
+          <Text size="sm" c="dimmed">
+            {data ? `Total decisions: ${data.total}` : "Total decisions: -"}
+          </Text>
           {isFetching && <Loader size="sm" />}
         </Group>
       </Group>
@@ -259,11 +279,18 @@ function DecisionsTable() {
                   <Table.Td>{decision.fromValue}</Table.Td>
                   <Table.Td>{decision.subjectText ?? "-"}</Table.Td>
                   <Table.Td>
-                    <Badge color={actionColor(decision.finalAction)} variant="light">
+                    <Badge
+                      color={actionColor(decision.finalAction)}
+                      variant="light"
+                    >
                       {decision.finalAction}
                     </Badge>
                   </Table.Td>
-                  <Table.Td>{decision.modelConfidence === null ? "-" : decision.modelConfidence.toFixed(2)}</Table.Td>
+                  <Table.Td>
+                    {decision.modelConfidence === null
+                      ? "-"
+                      : decision.modelConfidence.toFixed(2)}
+                  </Table.Td>
                   <Table.Td>{decision.reasonCode ?? "-"}</Table.Td>
                   <Table.Td>{decision.errorMessage ?? "-"}</Table.Td>
                 </Table.Tr>

@@ -1,5 +1,5 @@
-import { createHash } from "node:crypto";
 import type { Database } from "bun:sqlite";
+import { createHash } from "node:crypto";
 import type { ClassificationResult, FinalAction, MessageState } from "../types";
 
 function nowIso(): string {
@@ -16,16 +16,14 @@ export class StateRepository {
        WHERE imap_uid = ?1`,
     );
 
-    const row = query.get(imapUid) as
-      | {
-          imap_uid: number;
-          message_id: string | null;
-          status: "pending" | "processed" | "permanent_failure";
-          failure_count: number;
-          last_error: string | null;
-          last_attempt_at: string | null;
-        }
-      | null;
+    const row = query.get(imapUid) as {
+      imap_uid: number;
+      message_id: string | null;
+      status: "pending" | "processed" | "permanent_failure";
+      failure_count: number;
+      last_error: string | null;
+      last_attempt_at: string | null;
+    } | null;
 
     if (!row) {
       return null;
@@ -68,7 +66,11 @@ export class StateRepository {
       .run(imapUid, timestamp);
   }
 
-  recordFailure(imapUid: number, errorMessage: string, maxFailures: number): { failureCount: number; permanentFailure: boolean } {
+  recordFailure(
+    imapUid: number,
+    errorMessage: string,
+    maxFailures: number,
+  ): { failureCount: number; permanentFailure: boolean } {
     const current = this.getMessageState(imapUid);
     const nextFailureCount = (current?.failureCount ?? 0) + 1;
     const permanentFailure = nextFailureCount >= maxFailures;
@@ -100,8 +102,14 @@ export class StateRepository {
     return state.status === "pending";
   }
 
-  pruneOlderThan(days: number): { stateRowsDeleted: number; decisionsRowsDeleted: number; runsRowsDeleted: number } {
-    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  pruneOlderThan(days: number): {
+    stateRowsDeleted: number;
+    decisionsRowsDeleted: number;
+    runsRowsDeleted: number;
+  } {
+    const cutoff = new Date(
+      Date.now() - days * 24 * 60 * 60 * 1000,
+    ).toISOString();
 
     const stateResult = this.db
       .query("DELETE FROM message_state WHERE updated_at < ?1")
@@ -109,7 +117,9 @@ export class StateRepository {
     const decisionResult = this.db
       .query("DELETE FROM decisions WHERE created_at < ?1")
       .run(cutoff);
-    const runResult = this.db.query("DELETE FROM runs WHERE started_at < ?1").run(cutoff);
+    const runResult = this.db
+      .query("DELETE FROM runs WHERE started_at < ?1")
+      .run(cutoff);
 
     return {
       stateRowsDeleted: stateResult.changes,

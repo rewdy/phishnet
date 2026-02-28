@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { AllowlistMatcher } from "./allowlist";
 import type { EmailMessage } from "../types";
+import { AllowlistMatcher } from "./allowlist";
 
 const baseMessage: EmailMessage = {
   uid: 1,

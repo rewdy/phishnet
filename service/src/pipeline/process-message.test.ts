@@ -1,10 +1,18 @@
 import { beforeEach, describe, expect, test } from "bun:test";
-import { createDatabase, runMigrations } from "../db/database";
-import { DecisionsRepository, RunsRepository, StateRepository } from "../db/repositories";
-import { AllowlistMatcher } from "../filter/allowlist";
-import { processMessage } from "./process-message";
 import type { AppConfig } from "../config";
-import type { ClassificationInput, ClassificationResult, EmailMessage } from "../types";
+import { createDatabase, runMigrations } from "../db/database";
+import {
+  DecisionsRepository,
+  RunsRepository,
+  StateRepository,
+} from "../db/repositories";
+import { AllowlistMatcher } from "../filter/allowlist";
+import type {
+  ClassificationInput,
+  ClassificationResult,
+  EmailMessage,
+} from "../types";
+import { processMessage } from "./process-message";
 
 class MockImapClient {
   moved: number[] = [];
@@ -20,7 +28,11 @@ class MockImapClient {
 
 class MockClassifier {
   calls = 0;
-  constructor(private readonly handler: (input: ClassificationInput) => Promise<ClassificationResult>) {}
+  constructor(
+    private readonly handler: (
+      input: ClassificationInput,
+    ) => Promise<ClassificationResult>,
+  ) {}
 
   classify(input: ClassificationInput): Promise<ClassificationResult> {
     this.calls += 1;

@@ -31,7 +31,10 @@ export class ICloudImapClient implements ImapClient {
     try {
       const lock = await client.getMailboxLock(this.config.inboxMailbox);
       try {
-        const unreadResult = await client.search({ seen: false }, { uid: true });
+        const unreadResult = await client.search(
+          { seen: false },
+          { uid: true },
+        );
         const unreadUids = unreadResult === false ? [] : unreadResult;
         const selectedUids = unreadUids.slice(0, limit);
         if (selectedUids.length === 0) {
@@ -66,7 +69,9 @@ export class ICloudImapClient implements ImapClient {
             from: sender,
             subject: msg.envelope?.subject ?? "",
             bodyText: bodyText.slice(0, 100_000),
-            receivedAt: msg.internalDate ? new Date(msg.internalDate) : undefined,
+            receivedAt: msg.internalDate
+              ? new Date(msg.internalDate)
+              : undefined,
           });
         }
 
@@ -86,9 +91,13 @@ export class ICloudImapClient implements ImapClient {
     try {
       const lock = await client.getMailboxLock(this.config.inboxMailbox);
       try {
-        const moved = await client.messageMove(uid, this.config.junkMailbox, { uid: true });
+        const moved = await client.messageMove(uid, this.config.junkMailbox, {
+          uid: true,
+        });
         if (!moved) {
-          throw new Error(`Failed to move UID ${uid} to mailbox ${this.config.junkMailbox}`);
+          throw new Error(
+            `Failed to move UID ${uid} to mailbox ${this.config.junkMailbox}`,
+          );
         }
       } finally {
         lock.release();

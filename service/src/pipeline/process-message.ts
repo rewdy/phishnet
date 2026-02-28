@@ -1,10 +1,10 @@
-import { logger } from "../logger";
+import type { MessageClassifier } from "../classifier/openai";
+import type { AppConfig } from "../config";
 import type { DecisionsRepository, StateRepository } from "../db/repositories";
 import { serializeError } from "../errors";
 import type { AllowlistMatcher } from "../filter/allowlist";
 import type { ImapClient } from "../imap/client";
-import type { MessageClassifier } from "../classifier/openai";
-import type { AppConfig } from "../config";
+import { logger } from "../logger";
 import type { EmailMessage, ProcessResult } from "../types";
 
 export interface ProcessMessageDeps {
