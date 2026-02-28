@@ -13,6 +13,16 @@ It runs a background service that:
 
 It also includes a local API and web UI to inspect run history and decisions.
 
+## Stats UI
+
+Phishnet includes a local stats dashboard ("Phishnet Stats") that runs with the stack and reads data from the local API.
+
+- Start everything together with `bun run start` (service poller + API + UI preview).
+- If you install Phishnet with launchd (`bun run launchd:install`), the service/API/UI stack is kept running in the background, so you can open the stats dashboard whenever you want to check results.
+- Open the dashboard at `http://127.0.0.1:54321`.
+- The API serves the UI at `http://127.0.0.1:8787` by default.
+- Dashboard widgets include `filtered today`, `all time filtered`, `total runs`, plus a `Last run` timestamp.
+
 ## Installation
 
 See [INSTALL.md](./INSTALL.md) for full setup instructions:
@@ -30,7 +40,7 @@ From repo root:
 ```bash
 bun run dev                  # API + UI (vite dev)
 bun run web                  # API + UI preview (build + preview)
-bun run start                # service poller + API + UI preview
+bun run start                # service poller + API + UI preview (stats UI on http://127.0.0.1:54321)
 
 bun run service:run-once
 bun run service:dry-run-once
