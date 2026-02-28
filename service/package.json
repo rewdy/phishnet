@@ -1,0 +1,27 @@
+{
+  "name": "dream-catcher",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run src/cli.ts start",
+    "run-once": "bun run src/cli.ts run-once",
+    "dry-run-once": "bun run src/cli.ts dry-run-once",
+    "cleanup": "bun run src/cli.ts cleanup",
+    "check": "bunx tsc --noEmit",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/mailparser": "^3.4.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "imapflow": "^1.2.10",
+    "mailparser": "^3.9.3",
+    "openai": "^6.25.0",
+    "pino": "^10.3.1",
+    "zod": "^4.3.6"
+  }
+}

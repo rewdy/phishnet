@@ -1,12 +1,32 @@
 {
-  "name": "dream-catcher",
-  "module": "index.ts",
-  "type": "module",
+  "name": "dream-weaver",
   "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
+  "workspaces": [
+    "api",
+    "service",
+    "shared",
+    "ui"
+  ],
+  "scripts": {
+    "start": "run-p service:start web",
+    "dev": "run-p api:dev ui:dev",
+    "web": "run-p api:dev ui:serve",
+    "api:dev": "cd api && bun run dev",
+    "service:start": "cd service && bun run start",
+    "service:run-once": "cd service && bun run run-once",
+    "service:dry-run-once": "cd service && bun run dry-run-once",
+    "service:cleanup": "cd service && bun run cleanup",
+    "service:check": "cd service && bun run check",
+    "service:test": "cd service && bun run test",
+    "shared:build": "cd shared && bun run build",
+    "shared:check": "cd shared && bun run check",
+    "ui:dev": "cd ui && bun run dev",
+    "ui:serve": "run-s ui:build ui:preview",
+    "ui:build": "cd ui && bun run build",
+    "ui:preview": "cd ui && bun run preview",
+    "ui:lint": "cd ui && bun run lint"
   },
-  "peerDependencies": {
-    "typescript": "^5"
+  "devDependencies": {
+    "npm-run-all2": "^8.0.4"
   }
 }
