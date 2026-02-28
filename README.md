@@ -63,6 +63,7 @@ bun run launchd:uninstall
 - SQLite DB (default): `service/data/email-filter.db`
 - Installation/launchd docs: `INSTALL.md`
 - Launchd logs (when enabled): `~/Library/Logs/phishnet.*.log`
+- Note: log/data TTL retention is not currently implemented as an automatic policy. Data is retained until you manually remove it (or run cleanup explicitly).
 
 ---
 
