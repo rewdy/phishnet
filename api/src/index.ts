@@ -8,6 +8,7 @@ import {
   type RunsQuery,
   RunsQuerySchema,
   RunsResponseSchema,
+  StatsResponseSchema,
 } from "@phishnet/shared";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
@@ -220,6 +221,42 @@ app.get("/api/decisions", (c) => {
     total: Number(totalRow.count),
     limit: parsed.limit,
     offset: parsed.offset,
+  });
+
+  return c.json(response);
+});
+
+app.get("/api/stats", (c) => {
+  const filteredTodayRow = db
+    .query(
+      `SELECT COUNT(*) as count
+     FROM decisions
+     WHERE final_action = 'junk'
+       AND date(created_at, 'localtime') = date('now', 'localtime')`,
+    )
+    .get() as { count: number };
+
+  const allTimeFilteredRow = db
+    .query(
+      `SELECT COUNT(*) as count
+     FROM decisions
+     WHERE final_action = 'junk'`,
+    )
+    .get() as { count: number };
+
+  const totalRunsRow = db.query("SELECT COUNT(*) as count FROM runs").get() as {
+    count: number;
+  };
+
+  const lastRunRow = db
+    .query("SELECT started_at FROM runs ORDER BY started_at DESC LIMIT 1")
+    .get() as { started_at: string } | null;
+
+  const response = StatsResponseSchema.parse({
+    filteredToday: Number(filteredTodayRow.count),
+    allTimeFiltered: Number(allTimeFilteredRow.count),
+    totalRuns: Number(totalRunsRow.count),
+    lastRunAt: lastRunRow?.started_at ?? null,
   });
 
   return c.json(response);

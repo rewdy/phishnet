@@ -3,10 +3,12 @@ import {
   AppShell,
   Badge,
   Group,
+  Image,
   Loader,
   Pagination,
   Paper,
   Select,
+  SimpleGrid,
   Stack,
   Table,
   Tabs,
@@ -22,7 +24,8 @@ import {
 } from "@phishnet/shared";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { fetchDecisions, fetchRuns } from "./api";
+import { fetchDecisions, fetchRuns, fetchStats } from "./api";
+import phishnetLogo from "./assets/phishnet-logo.png";
 
 const PAGE_SIZE_OPTIONS = pageSizeValues.map((value) => ({
   value: String(value),
@@ -306,14 +309,63 @@ function DecisionsTable() {
 }
 
 function App() {
+  const {
+    data: stats,
+    error: statsError,
+    isFetching: statsFetching,
+  } = useQuery({
+    queryKey: ["stats"],
+    queryFn: fetchStats,
+    refetchInterval: 60_000,
+  });
+
   return (
     <AppShell padding="md">
       <AppShell.Main>
         <Stack gap="lg">
-          <Title order={2}>Email Filter Viewer</Title>
+          <Group gap="md" align="center">
+            <Image
+              src={phishnetLogo}
+              alt="Phishnet logo"
+              w={100}
+              h={100}
+              fit="contain"
+            />
+            <Title order={2}>Phishnet Stats</Title>
+          </Group>
           <Text c="dimmed" size="sm">
             Data refreshes every 60 seconds. Times shown in {TIMEZONE}.
           </Text>
+          <Text c="dimmed" size="sm">
+            <strong>Last run:</strong>{" "}
+            {stats?.lastRunAt ? formatTimestamp(stats.lastRunAt) : "-"}
+            {statsFetching ? " (refreshing...)" : ""}
+          </Text>
+          {statsError && (
+            <Alert color="red">{(statsError as Error).message}</Alert>
+          )}
+
+          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+            <Paper withBorder p="md" radius="md">
+              <Text size="sm" c="dimmed">
+                Filtered today
+              </Text>
+              <Title order={3}>{stats?.filteredToday ?? "-"}</Title>
+            </Paper>
+            <Paper withBorder p="md" radius="md">
+              <Text size="sm" c="dimmed">
+                All time filtered
+              </Text>
+              <Title order={3}>{stats?.allTimeFiltered ?? "-"}</Title>
+            </Paper>
+            <Paper withBorder p="md" radius="md">
+              <Text size="sm" c="dimmed">
+                Total runs
+              </Text>
+              <Title order={3}>{stats?.totalRuns ?? "-"}</Title>
+            </Paper>
+          </SimpleGrid>
+
           <Tabs defaultValue="decisions">
             <Tabs.List>
               <Tabs.Tab value="decisions">Decisions</Tabs.Tab>

@@ -5,6 +5,8 @@ import {
   type RunsQuery,
   type RunsResponse,
   RunsResponseSchema,
+  type StatsResponse,
+  StatsResponseSchema,
 } from "@phishnet/shared";
 
 function buildQueryString(
@@ -49,4 +51,14 @@ export async function fetchDecisions(
 
   const json = await response.json();
   return DecisionsResponseSchema.parse(json);
+}
+
+export async function fetchStats(): Promise<StatsResponse> {
+  const response = await fetch("/api/stats");
+  if (!response.ok) {
+    throw new Error(`Failed to fetch stats (${response.status})`);
+  }
+
+  const json = await response.json();
+  return StatsResponseSchema.parse(json);
 }

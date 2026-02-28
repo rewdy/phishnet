@@ -88,6 +88,13 @@ export const DecisionsResponseSchema = z.object({
   offset: z.number().int(),
 });
 
+export const StatsResponseSchema = z.object({
+  filteredToday: z.number().int().min(0),
+  allTimeFiltered: z.number().int().min(0),
+  totalRuns: z.number().int().min(0),
+  lastRunAt: z.string().nullable(),
+});
+
 export type FinalAction = z.infer<typeof FinalActionSchema>;
 export type RunStatus = z.infer<typeof RunStatusSchema>;
 export type RunsQuery = z.infer<typeof RunsQuerySchema>;
@@ -96,3 +103,4 @@ export type RunSummary = z.infer<typeof RunSummarySchema>;
 export type DecisionRow = z.infer<typeof DecisionRowSchema>;
 export type RunsResponse = z.infer<typeof RunsResponseSchema>;
 export type DecisionsResponse = z.infer<typeof DecisionsResponseSchema>;
+export type StatsResponse = z.infer<typeof StatsResponseSchema>;
