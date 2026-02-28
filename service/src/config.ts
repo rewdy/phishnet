@@ -28,7 +28,7 @@ const schema = z.object({
   JUNK_MAILBOX: z.string().default("Junk"),
   OPENAI_API_KEY: z.string().min(1),
   OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
-  POLL_INTERVAL_MINUTES: z.coerce.number().positive().default(30),
+  POLL_INTERVAL_MINUTES: z.coerce.number().positive().default(15),
   CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.6),
   MAX_MESSAGES_PER_RUN: z.coerce.number().int().positive().default(100),
   DRY_RUN: booleanFromEnv.default(true),

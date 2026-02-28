@@ -27,7 +27,7 @@ Defaults include:
 - `IMAP_HOST=imap.mail.me.com`
 - `IMAP_PORT=993`
 - `IMAP_SECURE=true`
-- `POLL_INTERVAL_MINUTES=30`
+- `POLL_INTERVAL_MINUTES=15`
 - `CONFIDENCE_THRESHOLD=0.6`
 
 ## 4. OpenAI API key setup
