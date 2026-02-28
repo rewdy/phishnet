@@ -1,6 +1,6 @@
 # phishnet
 
-<p><img src="./phishnet.png" alt="Phishnet logo" align=center /></p>
+<p align=center><img src="./phishnet.png" alt="Phishnet logo" /></p>
 
 Phishnet is a local-first email triage stack for iCloud Mail.
 
