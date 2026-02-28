@@ -27,6 +27,7 @@ Defaults include:
 - `IMAP_HOST=imap.mail.me.com`
 - `IMAP_PORT=993`
 - `IMAP_SECURE=true`
+- `FILTER_PROFILE=light` (`light` = sexual only, `balanced` = sexual + spam, `strict` = sexual + spam + annoyances)
 - `POLL_INTERVAL_MINUTES=15`
 - `CONFIDENCE_THRESHOLD=0.6`
 

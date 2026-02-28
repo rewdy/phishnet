@@ -21,6 +21,7 @@ export function buildApp() {
   const classifier = new OpenAIClassifier(
     config.openai.apiKey,
     config.openai.model,
+    config.openai.filterProfile,
   );
   const imapClient = new ICloudImapClient(config.imap);
 

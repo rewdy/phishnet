@@ -28,6 +28,7 @@ const schema = z.object({
   JUNK_MAILBOX: z.string().default("Junk"),
   OPENAI_API_KEY: z.string().min(1),
   OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
+  FILTER_PROFILE: z.enum(["light", "balanced", "strict"]).default("light"),
   POLL_INTERVAL_MINUTES: z.coerce.number().positive().default(15),
   CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.6),
   MAX_MESSAGES_PER_RUN: z.coerce.number().int().positive().default(100),
@@ -51,6 +52,7 @@ export interface AppConfig {
   openai: {
     apiKey: string;
     model: string;
+    filterProfile: "light" | "balanced" | "strict";
   };
   pollIntervalMinutes: number;
   confidenceThreshold: number;
@@ -89,6 +91,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     openai: {
       apiKey: parsed.data.OPENAI_API_KEY,
       model: parsed.data.OPENAI_MODEL,
+      filterProfile: parsed.data.FILTER_PROFILE,
     },
     pollIntervalMinutes: parsed.data.POLL_INTERVAL_MINUTES,
     confidenceThreshold: parsed.data.CONFIDENCE_THRESHOLD,
