@@ -1,4 +1,4 @@
-import type { MessageClassifier } from "../classifier/openai";
+import type { MessageClassifier } from "../classifier";
 import type { AppConfig } from "../config";
 import type { DecisionsRepository, StateRepository } from "../db/repositories";
 import { serializeError } from "../errors";

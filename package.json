@@ -18,6 +18,7 @@
     "service:start": "cd service && bun run start",
     "service:run-once": "cd service && bun run run-once",
     "service:dry-run-once": "cd service && bun run dry-run-once",
+    "service:smoke-model": "cd service && bun run smoke-model",
     "service:cleanup": "cd service && bun run cleanup",
     "service:check": "cd service && bun run check",
     "service:test": "cd service && bun run test",

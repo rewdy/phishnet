@@ -65,6 +65,12 @@ beforeEach(() => {
       apiKey: "k",
       model: "m",
     },
+    ollama: {
+      baseUrl: "http://127.0.0.1:11434",
+      model: "llama3.1:8b",
+    },
+    modelProvider: "openai",
+    filterProfile: "light",
     pollIntervalMinutes: 30,
     confidenceThreshold: 0.6,
     maxMessagesPerRun: 100,

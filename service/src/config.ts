@@ -26,8 +26,11 @@ const schema = z.object({
   IMAP_PASSWORD: z.string().min(1),
   INBOX_MAILBOX: z.string().default("INBOX"),
   JUNK_MAILBOX: z.string().default("Junk"),
-  OPENAI_API_KEY: z.string().min(1),
+  MODEL_PROVIDER: z.enum(["openai", "ollama"]).default("openai"),
+  OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
+  OLLAMA_BASE_URL: z.string().default("http://127.0.0.1:11434"),
+  OLLAMA_MODEL: z.string().default("llama3.1:8b"),
   FILTER_PROFILE: z.enum(["light", "balanced", "strict"]).default("light"),
   POLL_INTERVAL_MINUTES: z.coerce.number().positive().default(15),
   CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.6),
@@ -49,10 +52,15 @@ export interface AppConfig {
     inboxMailbox: string;
     junkMailbox: string;
   };
+  modelProvider: "openai" | "ollama";
+  filterProfile: "light" | "balanced" | "strict";
   openai: {
     apiKey: string;
     model: string;
-    filterProfile: "light" | "balanced" | "strict";
+  };
+  ollama: {
+    baseUrl: string;
+    model: string;
   };
   pollIntervalMinutes: number;
   confidenceThreshold: number;
@@ -73,6 +81,13 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     throw new Error(`Invalid configuration: ${errors}`);
   }
 
+  const provider = parsed.data.MODEL_PROVIDER;
+  if (provider === "openai" && !parsed.data.OPENAI_API_KEY) {
+    throw new Error(
+      "Invalid configuration: OPENAI_API_KEY is required when MODEL_PROVIDER=openai",
+    );
+  }
+
   const allowlistPatterns = (parsed.data.ALLOWLIST_REGEX ?? "")
     .split(",")
     .map((value) => value.trim())
@@ -88,10 +103,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       inboxMailbox: parsed.data.INBOX_MAILBOX,
       junkMailbox: parsed.data.JUNK_MAILBOX,
     },
+    modelProvider: provider,
+    filterProfile: parsed.data.FILTER_PROFILE,
     openai: {
-      apiKey: parsed.data.OPENAI_API_KEY,
+      apiKey: parsed.data.OPENAI_API_KEY ?? "",
       model: parsed.data.OPENAI_MODEL,
-      filterProfile: parsed.data.FILTER_PROFILE,
+    },
+    ollama: {
+      baseUrl: parsed.data.OLLAMA_BASE_URL,
+      model: parsed.data.OLLAMA_MODEL,
     },
     pollIntervalMinutes: parsed.data.POLL_INTERVAL_MINUTES,
     confidenceThreshold: parsed.data.CONFIDENCE_THRESHOLD,

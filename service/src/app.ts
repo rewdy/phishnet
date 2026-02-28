@@ -1,4 +1,4 @@
-import { OpenAIClassifier } from "./classifier/openai";
+import { buildClassifier } from "./classifier";
 import { loadConfig } from "./config";
 import { createDatabase, runMigrations } from "./db/database";
 import {
@@ -18,11 +18,7 @@ export function buildApp() {
   const decisionsRepo = new DecisionsRepository(db);
   const runsRepo = new RunsRepository(db);
   const allowlist = new AllowlistMatcher(config.allowlistPatterns);
-  const classifier = new OpenAIClassifier(
-    config.openai.apiKey,
-    config.openai.model,
-    config.openai.filterProfile,
-  );
+  const classifier = buildClassifier(config);
   const imapClient = new ICloudImapClient(config.imap);
 
   return {

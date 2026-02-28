@@ -3,6 +3,7 @@ import { serializeError } from "./errors";
 import { runCleanup } from "./jobs/cleanup";
 import { startPoller } from "./jobs/poller";
 import { runOnce } from "./jobs/run-once";
+import { runModelSmoke } from "./jobs/smoke-model";
 import { logger } from "./logger";
 
 async function main(): Promise<void> {
@@ -34,6 +35,13 @@ async function main(): Promise<void> {
     }
     case "cleanup": {
       runCleanup(app.config, app.stateRepo);
+      return;
+    }
+    case "smoke-model": {
+      await runModelSmoke({
+        config: app.config,
+        classifier: app.classifier,
+      });
       return;
     }
     default: {

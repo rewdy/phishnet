@@ -6,6 +6,7 @@
     "start": "bun run src/cli.ts start",
     "run-once": "bun run src/cli.ts run-once",
     "dry-run-once": "bun run src/cli.ts dry-run-once",
+    "smoke-model": "bun run src/cli.ts smoke-model",
     "cleanup": "bun run src/cli.ts cleanup",
     "check": "bunx tsc --noEmit",
     "test": "bun test"

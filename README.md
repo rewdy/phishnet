@@ -7,7 +7,7 @@ Phishnet is a local-first email triage stack for iCloud Mail.
 It runs a background service that:
 
 - connects to your iCloud inbox over IMAP,
-- evaluates unread messages with OpenAI,
+- evaluates unread messages with a configurable model provider (OpenAI or local Ollama),
 - moves messages with sexual content to Junk,
 - stores runs/decisions in SQLite for auditability.
 
@@ -27,7 +27,7 @@ Phishnet includes a local stats dashboard ("Phishnet Stats") that runs with the 
 
 See [INSTALL.md](./INSTALL.md) for full setup instructions:
 - prerequisites
-- OpenAI key setup
+- model provider setup (OpenAI or Ollama)
 - iCloud app-specific password setup
 - launchd install/uninstall
 
@@ -44,6 +44,7 @@ bun run start                # service poller + API + UI preview (stats UI on ht
 
 bun run service:run-once
 bun run service:dry-run-once
+bun run service:smoke-model
 bun run service:start
 bun run service:cleanup
 
@@ -61,7 +62,7 @@ bun run launchd:uninstall
 
 ### Repository layout
 
-- `service/` background mail processor (IMAP + OpenAI + SQLite)
+- `service/` background mail processor (IMAP + model provider + SQLite)
 - `api/` local read API for run/decision data
 - `ui/` Mantine + React viewer
 - `shared/` shared Zod schemas/types used by API and UI
