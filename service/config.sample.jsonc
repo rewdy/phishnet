@@ -1,0 +1,49 @@
+{
+  // Non-secret configuration for Phishnet.
+  // Copy to service/config.jsonc and edit for your environment.
+
+  "imap": {
+    "host": "imap.mail.me.com",
+    "port": 993,
+    "secure": true,
+    "inboxMailbox": "INBOX",
+    "junkMailbox": "Junk"
+  },
+
+  "model": {
+    // "openai" or "ollama"
+    "provider": "openai",
+    "openaiModel": "gpt-4.1-mini",
+    "ollamaBaseUrl": "http://127.0.0.1:11434",
+    "ollamaModel": "llama3.1:8b"
+  },
+
+  "filtering": {
+    // "light" = sexual only, "balanced" = sexual + spam, "strict" = sexual + spam + annoyances
+    "profile": "light",
+    "confidenceThreshold": 0.6,
+    "allowlistPatterns": []
+  },
+
+  "runtime": {
+    "pollIntervalMinutes": 15,
+    "maxMessagesPerRun": 100,
+    "dryRun": true,
+    "maxClassificationFailures": 3
+  },
+
+  "storage": {
+    "sqlitePath": "./data/email-filter.db",
+    "logRetentionDays": 90
+  },
+
+  "network": {
+    // When true, API/UI bind to 0.0.0.0
+    "lanMode": false,
+    "apiHost": "127.0.0.1",
+    "apiPort": 8787,
+    "uiHost": "127.0.0.1",
+    "uiPort": 54321,
+    "uiAllowedHosts": []
+  }
+}

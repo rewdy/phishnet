@@ -31,7 +31,7 @@ This repo is a Bun monorepo with 4 workspaces:
 
 From repo root:
 - `bun run start`
-  - Uses `scripts/run-stack.sh` to load network config from `service/.env`.
+  - Uses `scripts/run-stack.ts` to load stack config from `service/config.jsonc` plus env overrides.
   - Runs `service:start` + `web` in parallel.
   - `web` runs `api:dev` and `ui:serve`.
 - UI static server runs on fixed port `54321` (localhost by default) via:
@@ -53,8 +53,8 @@ Run `bun run check` before committing.
 
 ### Root
 - `bun run dev` -> API + UI dev server
-- `bun run web` -> API + UI preview
-- `bun run start` -> service + API + UI preview
+- `bun run web` -> API + built UI static server
+- `bun run start` -> service + API + built UI static server
 - `bun run launchd:install`
 - `bun run launchd:restart`
 - `bun run launchd:status`
@@ -79,20 +79,22 @@ Run `bun run check` before committing.
 
 ## Key Configuration
 
-Primary env file is `service/.env`.
+Primary non-secret config file is `service/config.jsonc`.
+Sample: `service/config.sample.jsonc`.
+Primary secrets env file is `service/.env`.
 Template: `service/.env.template`.
 
 Important variables:
-- `IMAP_USER`, `IMAP_PASSWORD` (iCloud app-specific password)
-- `OPENAI_API_KEY`, `OPENAI_MODEL`
-- `FILTER_PROFILE`:
-  - `light`: sexual only
-  - `balanced`: sexual + spam
-  - `strict`: sexual + spam + annoyances
-- `POLL_INTERVAL_MINUTES` (default 15)
-- `CONFIDENCE_THRESHOLD` (default 0.6)
-- `DRY_RUN`
-- `SQLITE_PATH` (default `./data/email-filter.db` inside `service/`)
+- Secrets in `service/.env`:
+  - `IMAP_USER`, `IMAP_PASSWORD`, `OPENAI_API_KEY`
+- Non-secrets in `service/config.jsonc`:
+  - `model.provider` (`openai` or `ollama`)
+  - `filtering.profile` (`light`, `balanced`, `strict`)
+  - `runtime.pollIntervalMinutes`, `runtime.dryRun`, `runtime.maxMessagesPerRun`
+  - `filtering.confidenceThreshold`
+  - `storage.sqlitePath`, `storage.logRetentionDays`
+  - `network.lanMode`, `network.apiHost`/`apiPort`, `network.uiHost`/`uiPort`
+- Env vars remain supported as overrides when needed.
 
 ## Data / Persistence Notes
 

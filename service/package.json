@@ -19,6 +19,7 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@phishnet/shared": "workspace:*",
     "imapflow": "^1.2.10",
     "mailparser": "^3.9.3",
     "openai": "^6.25.0",

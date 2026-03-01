@@ -6,10 +6,11 @@ Local TypeScript/Bun service that polls iCloud IMAP, classifies unread mail with
 
 ```bash
 bun install
-cp .env.example .env
+cp .env.template .env
+cp config.sample.jsonc config.jsonc
 ```
 
-Fill `.env` with your iCloud and OpenAI credentials.
+Fill `.env` with secrets and `config.jsonc` with non-secret runtime options.
 
 ## Commands
 

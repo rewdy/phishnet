@@ -1,6 +1,7 @@
 # project specific ignores
 
 .env
+service/config.jsonc
 
 # dependencies (bun install)
 node_modules

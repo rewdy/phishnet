@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export {
+  defaultNonSecretConfig,
+  type NonSecretConfig,
+  NonSecretConfigSchema,
+  resolveNonSecretConfig,
+} from "./config";
+
 export const pageSizeValues = [25, 50, 75, 100] as const;
 
 export const FinalActionSchema = z.enum([

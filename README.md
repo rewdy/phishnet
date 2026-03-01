@@ -26,10 +26,14 @@ Phishnet includes a local stats dashboard ("Phishnet Stats") that runs with the 
 ### Optional LAN mode (opt-in)
 
 By default, API/UI bind to localhost only (`127.0.0.1`).  
-To expose the stats UI on your local network, set this in `service/.env`:
+To expose the stats UI on your local network, set this in `service/config.jsonc`:
 
-```env
-LAN_MODE=true
+```jsonc
+{
+  "network": {
+    "lanMode": true
+  }
+}
 ```
 
 Then restart the stack (`bun run start` or `bun run launchd:restart`).
@@ -92,6 +96,8 @@ bun run launchd:uninstall
 ### Data and logs
 
 - SQLite DB (default): `service/data/email-filter.db`
+- Primary non-secret config: `service/config.jsonc` (sample: `service/config.sample.jsonc`)
+- Secrets file: `service/.env`
 - Installation/launchd docs: `INSTALL.md`
 - Launchd logs (when enabled): `~/Library/Logs/phishnet.*.log`
 - Note: log/data TTL retention is not currently implemented as an automatic policy. Data is retained until you manually remove it (or run cleanup explicitly).

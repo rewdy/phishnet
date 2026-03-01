@@ -1,45 +1,13 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { type NonSecretConfig, resolveNonSecretConfig } from "@phishnet/shared";
+import { parse as parseJsonc } from "jsonc-parser";
 import { z } from "zod";
 
-const booleanFromEnv = z.preprocess((value) => {
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    if (["true", "1", "yes", "on"].includes(normalized)) {
-      return true;
-    }
-    if (["false", "0", "no", "off"].includes(normalized)) {
-      return false;
-    }
-  }
-
-  return value;
-}, z.boolean());
-
-const schema = z.object({
-  IMAP_HOST: z.string().default("imap.mail.me.com"),
-  IMAP_PORT: z.coerce.number().int().positive().default(993),
-  IMAP_SECURE: booleanFromEnv.default(true),
+const secretSchema = z.object({
   IMAP_USER: z.string().min(1),
   IMAP_PASSWORD: z.string().min(1),
-  INBOX_MAILBOX: z.string().default("INBOX"),
-  JUNK_MAILBOX: z.string().default("Junk"),
-  MODEL_PROVIDER: z.enum(["openai", "ollama"]).default("openai"),
   OPENAI_API_KEY: z.string().optional(),
-  OPENAI_MODEL: z.string().default("gpt-4.1-mini"),
-  OLLAMA_BASE_URL: z.string().default("http://127.0.0.1:11434"),
-  OLLAMA_MODEL: z.string().default("llama3.1:8b"),
-  FILTER_PROFILE: z.enum(["light", "balanced", "strict"]).default("light"),
-  POLL_INTERVAL_MINUTES: z.coerce.number().positive().default(15),
-  CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.6),
-  MAX_MESSAGES_PER_RUN: z.coerce.number().int().positive().default(100),
-  DRY_RUN: booleanFromEnv.default(true),
-  SQLITE_PATH: z.string().default("./data/email-filter.db"),
-  MAX_CLASSIFICATION_FAILURES: z.coerce.number().int().positive().default(3),
-  LOG_RETENTION_DAYS: z.coerce.number().int().positive().default(90),
-  ALLOWLIST_REGEX: z.string().optional(),
 });
 
 export interface AppConfig {
@@ -72,54 +40,93 @@ export interface AppConfig {
   allowlistPatterns: string[];
 }
 
+function parseConfigFile(configPath: string): unknown {
+  try {
+    const raw = readFileSync(configPath, "utf8");
+    const errors: Array<{
+      error: number;
+      offset: number;
+      length: number;
+    }> = [];
+    const parsed = parseJsonc(raw, errors, {
+      allowTrailingComma: true,
+      disallowComments: false,
+    });
+
+    if (errors.length > 0) {
+      throw new Error(
+        errors
+          .map(
+            (entry) =>
+              `code=${entry.error} at offset=${entry.offset} length=${entry.length}`,
+          )
+          .join("; "),
+      );
+    }
+
+    return parsed ?? {};
+  } catch (error) {
+    if (error instanceof Error && "code" in error && error.code === "ENOENT") {
+      return {};
+    }
+    const errText = error instanceof Error ? error.message : String(error);
+    throw new Error(`Invalid configuration file at ${configPath}: ${errText}`);
+  }
+}
+
+function resolveNonSecret(env: NodeJS.ProcessEnv): NonSecretConfig {
+  const configPath = env.PHISHNET_CONFIG_PATH
+    ? env.PHISHNET_CONFIG_PATH
+    : join(import.meta.dir, "..", "config.jsonc");
+  const fileConfig = parseConfigFile(configPath);
+  return resolveNonSecretConfig(fileConfig, env);
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
-  const parsed = schema.safeParse(env);
-  if (!parsed.success) {
-    const errors = parsed.error.issues
+  const nonSecretConfig = resolveNonSecret(env);
+  const parsedSecrets = secretSchema.safeParse(env);
+  if (!parsedSecrets.success) {
+    const errors = parsedSecrets.error.issues
       .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
       .join("; ");
-    throw new Error(`Invalid configuration: ${errors}`);
+    throw new Error(`Invalid configuration (env secrets): ${errors}`);
   }
 
-  const provider = parsed.data.MODEL_PROVIDER;
-  if (provider === "openai" && !parsed.data.OPENAI_API_KEY) {
+  const provider = nonSecretConfig.model.provider;
+  if (provider === "openai" && !parsedSecrets.data.OPENAI_API_KEY) {
     throw new Error(
-      "Invalid configuration: OPENAI_API_KEY is required when MODEL_PROVIDER=openai",
+      "Invalid configuration: OPENAI_API_KEY is required when model.provider=openai",
     );
   }
 
-  const allowlistPatterns = (parsed.data.ALLOWLIST_REGEX ?? "")
-    .split(",")
-    .map((value) => value.trim())
-    .filter(Boolean);
-
   return {
     imap: {
-      host: parsed.data.IMAP_HOST,
-      port: parsed.data.IMAP_PORT,
-      secure: parsed.data.IMAP_SECURE,
-      user: parsed.data.IMAP_USER,
-      password: parsed.data.IMAP_PASSWORD,
-      inboxMailbox: parsed.data.INBOX_MAILBOX,
-      junkMailbox: parsed.data.JUNK_MAILBOX,
+      host: nonSecretConfig.imap.host,
+      port: nonSecretConfig.imap.port,
+      secure: nonSecretConfig.imap.secure,
+      user: parsedSecrets.data.IMAP_USER,
+      password: parsedSecrets.data.IMAP_PASSWORD,
+      inboxMailbox: nonSecretConfig.imap.inboxMailbox,
+      junkMailbox: nonSecretConfig.imap.junkMailbox,
     },
     modelProvider: provider,
-    filterProfile: parsed.data.FILTER_PROFILE,
+    filterProfile: nonSecretConfig.filtering.profile,
     openai: {
-      apiKey: parsed.data.OPENAI_API_KEY ?? "",
-      model: parsed.data.OPENAI_MODEL,
+      apiKey: parsedSecrets.data.OPENAI_API_KEY ?? "",
+      model: nonSecretConfig.model.openaiModel,
     },
     ollama: {
-      baseUrl: parsed.data.OLLAMA_BASE_URL,
-      model: parsed.data.OLLAMA_MODEL,
+      baseUrl: nonSecretConfig.model.ollamaBaseUrl,
+      model: nonSecretConfig.model.ollamaModel,
     },
-    pollIntervalMinutes: parsed.data.POLL_INTERVAL_MINUTES,
-    confidenceThreshold: parsed.data.CONFIDENCE_THRESHOLD,
-    maxMessagesPerRun: parsed.data.MAX_MESSAGES_PER_RUN,
-    dryRun: parsed.data.DRY_RUN,
-    sqlitePath: parsed.data.SQLITE_PATH,
-    maxClassificationFailures: parsed.data.MAX_CLASSIFICATION_FAILURES,
-    logRetentionDays: parsed.data.LOG_RETENTION_DAYS,
-    allowlistPatterns,
+    pollIntervalMinutes: nonSecretConfig.runtime.pollIntervalMinutes,
+    confidenceThreshold: nonSecretConfig.filtering.confidenceThreshold,
+    maxMessagesPerRun: nonSecretConfig.runtime.maxMessagesPerRun,
+    dryRun: nonSecretConfig.runtime.dryRun,
+    sqlitePath: nonSecretConfig.storage.sqlitePath,
+    maxClassificationFailures:
+      nonSecretConfig.runtime.maxClassificationFailures,
+    logRetentionDays: nonSecretConfig.storage.logRetentionDays,
+    allowlistPatterns: nonSecretConfig.filtering.allowlistPatterns,
   };
 }

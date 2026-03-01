@@ -13,38 +13,39 @@
 
 ```bash
 bun install
+cp service/config.sample.jsonc service/config.jsonc
 cp service/.env.template service/.env
 ```
 
-## 3. Configure service credentials
+## 3. Configure non-secret runtime options
+
+Edit `service/config.jsonc` for non-secret settings, for example:
+
+- model provider (`model.provider`)
+- filter profile / confidence threshold (`filtering.*`)
+- polling interval / dry run (`runtime.*`)
+- storage path and retention (`storage.*`)
+- LAN and host/port settings (`network.*`)
+
+Defaults are shown in `service/config.sample.jsonc`.
+
+## 4. Configure service secrets in `service/.env`
 
 Edit `service/.env` and set at minimum:
 
 - `IMAP_USER` (your full iCloud email, e.g. `name@icloud.com`)
 - `IMAP_PASSWORD` (Apple app-specific password)
-- `MODEL_PROVIDER` (`openai` or `ollama`)
-- For OpenAI: `OPENAI_API_KEY`
-- For Ollama: `OLLAMA_MODEL` (and optional `OLLAMA_BASE_URL`)
+- For OpenAI provider: `OPENAI_API_KEY`
 
-Defaults include:
+## 5. Model provider setup
 
-- `IMAP_HOST=imap.mail.me.com`
-- `IMAP_PORT=993`
-- `IMAP_SECURE=true`
-- `MODEL_PROVIDER=openai`
-- `FILTER_PROFILE=light` (`light` = sexual only, `balanced` = sexual + spam, `strict` = sexual + spam + annoyances)
-- `POLL_INTERVAL_MINUTES=15`
-- `CONFIDENCE_THRESHOLD=0.6`
-
-## 4. Model provider setup
-
-### OpenAI setup (`MODEL_PROVIDER=openai`)
+### OpenAI setup (`model.provider=openai`)
 
 - Create a project API key in the OpenAI API dashboard.
 - Recommended: restricted key with model request permissions for chat completions.
 - Place it in `service/.env` as `OPENAI_API_KEY`.
 
-### Ollama setup (`MODEL_PROVIDER=ollama`)
+### Ollama setup (`model.provider=ollama`)
 
 1. Install Ollama locally.
 2. Pull the model you want to use (example):
@@ -53,10 +54,10 @@ Defaults include:
 ollama pull llama3.1:8b
 ```
 
-3. Set `OLLAMA_MODEL` in `service/.env` to your pulled model name.
-4. Keep `OLLAMA_BASE_URL=http://127.0.0.1:11434` unless your Ollama server runs elsewhere.
+3. Set `model.ollamaModel` in `service/config.jsonc`.
+4. Keep `model.ollamaBaseUrl=http://127.0.0.1:11434` unless your Ollama server runs elsewhere.
 
-## 5. iCloud app-specific password setup
+## 6. iCloud app-specific password setup
 
 Use an app-specific password (not your Apple ID password):
 
@@ -68,7 +69,7 @@ Use an app-specific password (not your Apple ID password):
 
 Note: username is your iCloud mailbox address (for example `you@icloud.com`).
 
-## 6. Verify service
+## 7. Verify service
 
 Run a dry-run cycle:
 
@@ -82,7 +83,7 @@ Validate model-provider connectivity and output parsing:
 bun run service:smoke-model
 ```
 
-## 7. Optional: run as persistent background services with launchd
+## 8. Optional: run as persistent background services with launchd
 
 Phishnet includes user-specific launchd scripts:
 
@@ -114,7 +115,7 @@ Check status:
 bun run launchd:status
 ```
 
-Restart the stack service (for example, after changing `service/.env`):
+Restart the stack service (for example, after changing `service/config.jsonc` or `service/.env`):
 
 ```bash
 bun run launchd:restart
@@ -124,10 +125,14 @@ bun run launchd:restart
 
 By default, Phishnet binds UI/API to `127.0.0.1` (local machine only).
 
-To make the stats UI reachable from other devices on your local network, set in `service/.env`:
+To make the stats UI reachable from other devices on your local network, set in `service/config.jsonc`:
 
-```env
-LAN_MODE=true
+```jsonc
+{
+  "network": {
+    "lanMode": true
+  }
+}
 ```
 
 Then restart:

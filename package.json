@@ -8,13 +8,13 @@
     "ui"
   ],
   "scripts": {
-    "start": "./scripts/run-stack.sh start",
+    "start": "bun run scripts/run-stack.ts start",
     "start:internal": "run-p service:start web:internal",
     "format": "biome format --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
     "dev": "run-p api:dev ui:dev",
-    "web": "./scripts/run-stack.sh web",
+    "web": "bun run scripts/run-stack.ts web",
     "web:internal": "run-p api:dev ui:serve",
     "api:dev": "cd api && bun run dev",
     "service:start": "cd service && bun run start",
@@ -38,6 +38,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.4",
+    "dotenv": "^17.3.1",
+    "jsonc-parser": "^3.3.1",
     "npm-run-all2": "^8.0.4"
   }
 }
