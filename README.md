@@ -21,7 +21,7 @@ Phishnet includes a local stats dashboard ("Phishnet Stats") that runs with the 
 - If you install Phishnet with launchd (`bun run launchd:install`), the service/API/UI stack is kept running in the background, so you can open the stats dashboard whenever you want to check results.
 - Open the dashboard at `http://127.0.0.1:54321`.
 - The API serves the UI at `http://127.0.0.1:8787` by default.
-- Dashboard widgets include `filtered today`, `all time filtered`, `total runs`, plus a `Last run` timestamp.
+- Dashboard widgets include `filtered today`, `all time filtered`, `total runs`, `total messages scanned`, plus a `Last run` timestamp.
 
 ## Installation
 

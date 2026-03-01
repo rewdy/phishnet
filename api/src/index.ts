@@ -247,6 +247,9 @@ app.get("/api/stats", (c) => {
   const totalRunsRow = db.query("SELECT COUNT(*) as count FROM runs").get() as {
     count: number;
   };
+  const totalMessagesScannedRow = db
+    .query("SELECT COALESCE(SUM(messages_scanned), 0) as count FROM runs")
+    .get() as { count: number };
 
   const lastRunRow = db
     .query("SELECT started_at FROM runs ORDER BY started_at DESC LIMIT 1")
@@ -256,6 +259,7 @@ app.get("/api/stats", (c) => {
     filteredToday: Number(filteredTodayRow.count),
     allTimeFiltered: Number(allTimeFilteredRow.count),
     totalRuns: Number(totalRunsRow.count),
+    totalMessagesScanned: Number(totalMessagesScannedRow.count),
     lastRunAt: lastRunRow?.started_at ?? null,
   });
 

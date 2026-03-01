@@ -92,6 +92,7 @@ export const StatsResponseSchema = z.object({
   filteredToday: z.number().int().min(0),
   allTimeFiltered: z.number().int().min(0),
   totalRuns: z.number().int().min(0),
+  totalMessagesScanned: z.number().int().min(0),
   lastRunAt: z.string().nullable(),
 });
 

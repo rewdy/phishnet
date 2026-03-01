@@ -160,9 +160,7 @@ function RunsTable() {
 function DecisionsTable() {
   const [limit, setLimit] = useState<number>(25);
   const [page, setPage] = useState<number>(1);
-  const [finalAction, setFinalAction] = useState<FinalAction | undefined>(
-    undefined,
-  );
+  const [finalAction, setFinalAction] = useState<FinalAction | "all">("junk");
   const [fromFilter, setFromFilter] = useState<string>("");
   const [hasError, setHasError] = useState<boolean | undefined>(undefined);
 
@@ -170,7 +168,7 @@ function DecisionsTable() {
     () => ({
       limit,
       offset: (page - 1) * limit,
-      finalAction,
+      finalAction: finalAction === "all" ? undefined : finalAction,
       from: fromFilter.trim() ? fromFilter.trim() : undefined,
       hasError,
     }),
@@ -202,13 +200,14 @@ function DecisionsTable() {
           />
           <Select
             label="Final action"
-            clearable
             value={finalAction}
             onChange={(value) => {
-              setFinalAction((value as FinalAction | null) ?? undefined);
+              if (!value) return;
+              setFinalAction(value as FinalAction | "all");
               setPage(1);
             }}
             data={[
+              { value: "all", label: "All actions" },
               { value: "junk", label: "junk" },
               { value: "keep", label: "keep" },
               { value: "allowlist_skip", label: "allowlist_skip" },
@@ -345,7 +344,7 @@ function App() {
             <Alert color="red">{(statsError as Error).message}</Alert>
           )}
 
-          <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+          <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="md">
             <Paper withBorder p="md" radius="md">
               <Text size="sm" c="dimmed">
                 Filtered today
@@ -363,6 +362,12 @@ function App() {
                 Total runs
               </Text>
               <Title order={3}>{stats?.totalRuns ?? "-"}</Title>
+            </Paper>
+            <Paper withBorder p="md" radius="md">
+              <Text size="sm" c="dimmed">
+                Total messages scanned
+              </Text>
+              <Title order={3}>{stats?.totalMessagesScanned ?? "-"}</Title>
             </Paper>
           </SimpleGrid>
 
