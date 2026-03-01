@@ -9,6 +9,7 @@ import {
   Title,
 } from "@mantine/core";
 import phishnetLogo from "./assets/phishnet-logo.png";
+import { ColorSchemeToggle } from "./components/color-scheme-toggle";
 import { DecisionsTable } from "./components/decisions-table";
 import { RunsTable } from "./components/runs-table";
 import { StatsCards } from "./components/stats-cards";
@@ -29,15 +30,18 @@ function App() {
     <AppShell padding="md">
       <AppShell.Main>
         <Stack gap="lg">
-          <Group gap="md" align="center">
-            <Image
-              src={phishnetLogo}
-              alt="Phishnet logo"
-              w={100}
-              h={100}
-              fit="contain"
-            />
-            <Title order={2}>Phishnet Stats</Title>
+          <Group justify="space-between" align="center" wrap="nowrap">
+            <Group gap="md" align="center" wrap="nowrap">
+              <Image
+                src={phishnetLogo}
+                alt="Phishnet logo"
+                w={{ base: 60, sm: 100 }}
+                h={{ base: 60, sm: 100 }}
+                fit="contain"
+              />
+              <Title order={2}>Phishnet Stats</Title>
+            </Group>
+            <ColorSchemeToggle />
           </Group>
           <Text c="dimmed" size="sm">
             Data refreshes every 60 seconds. Times shown in {TIMEZONE}.

@@ -10,10 +10,11 @@
     "preview": "bun run serve-static.ts"
   },
   "dependencies": {
-    "@phishnet/shared": "workspace:*",
     "@mantine/charts": "^8.3.15",
     "@mantine/core": "^8.3.15",
     "@mantine/hooks": "^8.3.15",
+    "@phishnet/shared": "workspace:*",
+    "@tabler/icons-react": "^3.37.1",
     "@tanstack/react-query": "^5.90.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
