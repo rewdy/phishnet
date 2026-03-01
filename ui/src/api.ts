@@ -21,6 +21,9 @@ function buildQueryString(
   return stringified.length > 0 ? `?${stringified}` : "";
 }
 
+/**
+ * Fetches a paginated runs list from the local API.
+ */
 export async function fetchRuns(params: RunsQuery): Promise<RunsResponse> {
   const response = await fetch(`/api/runs${buildQueryString(params)}`);
   if (!response.ok) {
@@ -31,6 +34,9 @@ export async function fetchRuns(params: RunsQuery): Promise<RunsResponse> {
   return RunsResponseSchema.parse(json);
 }
 
+/**
+ * Fetches a paginated, filterable decisions list from the local API.
+ */
 export async function fetchDecisions(
   params: DecisionsQuery,
 ): Promise<DecisionsResponse> {
@@ -53,6 +59,9 @@ export async function fetchDecisions(
   return DecisionsResponseSchema.parse(json);
 }
 
+/**
+ * Fetches dashboard summary stats from the local API.
+ */
 export async function fetchStats(): Promise<StatsResponse> {
   const response = await fetch("/api/stats");
   if (!response.ok) {
