@@ -17,15 +17,34 @@ It also includes a local API and web UI to inspect run history and decisions.
 
 Phishnet includes a local stats dashboard ("Phishnet Stats") that runs with the stack and reads data from the local API.
 
-- Start everything together with `bun run start` (service poller + API + UI preview).
+- Start everything together with `bun run start` (service poller + API + UI static server).
 - If you install Phishnet with launchd (`bun run launchd:install`), the service/API/UI stack is kept running in the background, so you can open the stats dashboard whenever you want to check results.
 - Open the dashboard at `http://127.0.0.1:54321`.
 - The API serves the UI at `http://127.0.0.1:8787` by default.
 - Dashboard widgets include `filtered today`, `all time filtered`, `total runs`, `total messages scanned`, plus a `Last run` timestamp.
 
+### Optional LAN mode (opt-in)
+
+By default, API/UI bind to localhost only (`127.0.0.1`).  
+To expose the stats UI on your local network, set this in `service/.env`:
+
+```env
+LAN_MODE=true
+```
+
+Then restart the stack (`bun run start` or `bun run launchd:restart`).
+
+In LAN mode, API/UI bind to `0.0.0.0`, so other devices can access:
+
+- `http://<your-mac-lan-ip>:54321` (UI)
+- `http://<your-mac-lan-ip>:8787` (API)
+
+Note: there is no auth gate on this local API/UI. Only enable LAN mode on trusted networks.
+
 ## Installation
 
 See [INSTALL.md](./INSTALL.md) for full setup instructions:
+
 - prerequisites
 - model provider setup (OpenAI or Ollama)
 - iCloud app-specific password setup
@@ -39,8 +58,8 @@ From repo root:
 
 ```bash
 bun run dev                  # API + UI (vite dev)
-bun run web                  # API + UI preview (build + preview)
-bun run start                # service poller + API + UI preview (stats UI on http://127.0.0.1:54321)
+bun run web                  # API + built UI static server
+bun run start                # service poller + API + built UI static server (stats UI on http://127.0.0.1:54321)
 
 bun run service:run-once
 bun run service:dry-run-once

@@ -9,6 +9,10 @@ import {
   StatsResponseSchema,
 } from "@phishnet/shared";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ??
+  `${window.location.protocol}//${window.location.hostname}:${import.meta.env.VITE_API_PORT ?? "8787"}`;
+
 function buildQueryString(
   params: Record<string, string | number | undefined>,
 ): string {
@@ -21,11 +25,17 @@ function buildQueryString(
   return stringified.length > 0 ? `?${stringified}` : "";
 }
 
+function buildApiUrl(path: string): string {
+  return `${API_BASE_URL}${path}`;
+}
+
 /**
  * Fetches a paginated runs list from the local API.
  */
 export async function fetchRuns(params: RunsQuery): Promise<RunsResponse> {
-  const response = await fetch(`/api/runs${buildQueryString(params)}`);
+  const response = await fetch(
+    buildApiUrl(`/api/runs${buildQueryString(params)}`),
+  );
   if (!response.ok) {
     throw new Error(`Failed to fetch runs (${response.status})`);
   }
@@ -41,15 +51,17 @@ export async function fetchDecisions(
   params: DecisionsQuery,
 ): Promise<DecisionsResponse> {
   const response = await fetch(
-    `/api/decisions${buildQueryString({
-      ...params,
-      hasError:
-        params.hasError === undefined
-          ? undefined
-          : params.hasError
-            ? "true"
-            : "false",
-    })}`,
+    buildApiUrl(
+      `/api/decisions${buildQueryString({
+        ...params,
+        hasError:
+          params.hasError === undefined
+            ? undefined
+            : params.hasError
+              ? "true"
+              : "false",
+      })}`,
+    ),
   );
   if (!response.ok) {
     throw new Error(`Failed to fetch decisions (${response.status})`);
@@ -63,7 +75,7 @@ export async function fetchDecisions(
  * Fetches dashboard summary stats from the local API.
  */
 export async function fetchStats(): Promise<StatsResponse> {
-  const response = await fetch("/api/stats");
+  const response = await fetch(buildApiUrl("/api/stats"));
   if (!response.ok) {
     throw new Error(`Failed to fetch stats (${response.status})`);
   }

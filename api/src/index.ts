@@ -14,7 +14,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 const app = new Hono();
-const port = Number(process.env.PORT ?? 8787);
+const port = Number(process.env.API_PORT ?? process.env.PORT ?? 8787);
+const hostname = process.env.API_HOST ?? process.env.HOST ?? "127.0.0.1";
 const sqlitePath =
   process.env.SERVICE_DB_PATH ?? "../service/data/email-filter.db";
 const db = new Database(sqlitePath, { create: false, strict: true });
@@ -268,5 +269,6 @@ app.get("/api/stats", (c) => {
 
 export default {
   port,
+  hostname,
   fetch: app.fetch,
 };

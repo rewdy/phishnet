@@ -120,6 +120,28 @@ Restart the stack service (for example, after changing `service/.env`):
 bun run launchd:restart
 ```
 
+### Optional: enable LAN access to the stats UI/API
+
+By default, Phishnet binds UI/API to `127.0.0.1` (local machine only).
+
+To make the stats UI reachable from other devices on your local network, set in `service/.env`:
+
+```env
+LAN_MODE=true
+```
+
+Then restart:
+
+```bash
+bun run launchd:restart
+```
+
+Access from another device using your Mac's LAN IP:
+- UI: `http://<your-mac-lan-ip>:54321`
+- API: `http://<your-mac-lan-ip>:8787`
+
+Security note: the local API/UI does not include authentication. Use LAN mode only on trusted networks.
+
 Logs:
 
 - `~/Library/Logs/phishnet.stack.out.log`

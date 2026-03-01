@@ -31,11 +31,12 @@ This repo is a Bun monorepo with 4 workspaces:
 
 From repo root:
 - `bun run start`
+  - Uses `scripts/run-stack.sh` to load network config from `service/.env`.
   - Runs `service:start` + `web` in parallel.
   - `web` runs `api:dev` and `ui:serve`.
-- UI preview runs on fixed port `54321` (localhost) via:
-  - `ui:preview`: `vite preview --host 127.0.0.1 --port 54321 --strictPort`
-- API default port is `8787` in `api/src/index.ts` (`PORT` override supported).
+- UI static server runs on fixed port `54321` (localhost by default) via:
+  - `ui:preview`: `bun run serve-static.ts`
+- API default port is `8787` in `api/src/index.ts` (`API_PORT` and `PORT` override supported).
 
 ## Formatting / Linting
 
